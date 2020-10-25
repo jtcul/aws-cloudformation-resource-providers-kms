@@ -1,0 +1,153 @@
+{
+  "typeName": "AWS::KMS::Grant",
+  "description": "The AWS::KMS::Grant resource specifies an extra set of permissions that can be applied to a customer master key (CMK) in AWS Key Management Service (AWS KMS). With grants you can programmatically delegate the use of KMS customer master keys (CMKs) to other AWS principals. You can use them to allow access, but not deny it. Because grants can be very specific, and are easy to create and revoke, they are often used to provide temporary permissions or more granular permissions.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-kms",
+  "definitions": {
+    "KeyValuePair": {
+      "description": "A key-value pair of strings.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name for the pair. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the pair. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "properties": {
+    "KeyId": {
+      "description": "The unique identifier for the customer master key (CMK) that the grant applies to. Specify the key ID or the Amazon Resource Name (ARN) of the CMK. You cannot specify an alias. For help finding the key ID and ARN, see Finding the Key ID and ARN in the AWS Key Management Service Developer Guide.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "GranteePrincipal": {
+      "description": "The principal that is given permission to perform the operations that the grant permits. To specify the principal, use the Amazon Resource Name (ARN) of an AWS principal. Valid AWS principals include AWS accounts (root), IAM users, IAM roles, federated users, and assumed role users. For examples of the ARN syntax to use for specifying a principal, see AWS Identity and Access Management (IAM) in the Example ARNs section of the AWS General Reference.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "RetiringPrincipal": {
+      "description": "The principal that is given permission to retire the grant by using RetireGrant operation. To specify the principal, use the Amazon Resource Name (ARN) of an AWS principal. Valid AWS principals include AWS accounts (root), IAM users, IAM roles, federated users, and assumed role users. For examples of the ARN syntax to use for specifying a principal, see AWS Identity and Access Management (IAM) in the Example ARNs section of the AWS General Reference.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "Operations": {
+      "description": "A list of operations that the grant permits.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Decrypt",
+          "Encrypt",
+          "GenerateDataKey",
+          "GenerateDataKeyWithoutPlaintext",
+          "ReEncryptFrom",
+          "ReEncryptTo",
+          "Sign",
+          "Verify",
+          "GetPublicKey",
+          "CreateGrant",
+          "RetireGrant",
+          "DescribeKey",
+          "GenerateDataKeyPair",
+          "GenerateDataKeyPairWithoutPlaintext"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "Constraints": {
+      "description": "Allows a cryptographic operation only when the encryption context matches or includes the encryption context specified in this structure. For more information about encryption context, see Encryption Context in the AWS Key Management Service Developer Guide.",
+      "type": "object",
+      "properties": {
+        "EncryptionContextSubset": {
+          "description": "A list of key-value pairs that must be included in the encryption context of the cryptographic operation request. The grant allows the cryptographic operation only when the encryption context in the request includes the key-value pairs specified in this constraint, although it can include additional key-value pairs.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/KeyValuePair"
+          }
+        },
+        "EncryptionContextEquals": {
+          "description": "A list of key-value pairs that must match the encryption context in the cryptographic operation request. The grant allows the operation only when the encryption context in the request is the same as the encryption context specified in this constraint.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/KeyValuePair"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "GrantTokens": {
+      "description": "A list of grant tokens. For more information, see Grant Tokens in the AWS Key Management Service Developer Guide.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 8192
+      },
+      "maxItems": 10,
+      "uniqueItems": true
+    },
+    "Name": {
+      "description": "A friendly name for identifying the grant. Use this value to prevent the unintended creation of duplicate grants when retrying this request.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "GrantId": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "KeyId",
+    "GranteePrincipal",
+    "Operations"
+  ],
+  "createOnlyProperties": [
+    "/properties/KeyId"
+  ],
+  "readOnlyProperties": [
+    "/properties/GrantId"
+  ],
+  "writeOnlyProperties": [
+    "/properties/GrantTokens"
+  ],
+  "primaryIdentifier": [
+    "/properties/KeyId",
+    "/properties/GrantId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "kms:CreateGrant"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "kms:ListGrants"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "kms:RevokeGrant"
+      ]
+    }
+  }
+}
